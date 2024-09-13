@@ -85,6 +85,7 @@ export default function Home() {
   const contentEditableRef = useRef<HTMLDivElement>(null);
 
   const handleTextareaChange = () => {
+    if(typeof window !== 'undefined'){
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
@@ -94,6 +95,7 @@ export default function Home() {
       setCursorPosition(preCaretRange.toString().length);
     }
 
+    }
     const content = contentEditableRef.current?.innerHTML || "";
     if (content.endsWith("/")) {
       setShowCommandPopup(true);

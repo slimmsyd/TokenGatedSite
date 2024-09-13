@@ -17,6 +17,7 @@
     "encoding": "^0.1.13",
     "ethers": "^6.13.2",
     "next": "14.2.9",
+    "p5": "^1.10.0",
     "pino-pretty": "^11.2.2",
     "react": "^18",
     "react-dom": "^18",
@@ -27,6 +28,7 @@
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/p5": "^1.7.6",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "eslint": "^8",

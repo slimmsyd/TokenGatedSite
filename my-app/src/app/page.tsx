@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   useAccount,
   useBalance,
@@ -18,6 +18,7 @@ import Link from "next/link";
 import Video from "./components/Video";
 import { parseUnits } from "viem";
 import { db } from "./lib/db";
+import p5 from "p5";
 
 export default function Home() {
   const { isConnected, address } = useAccount();
@@ -141,19 +142,22 @@ export default function Home() {
       description:
         "An NFT launch project on the Base Network featuring unique digital creatures.",
       link: "https://creaturecubes.art/",
-      video: "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmaLGSyy1Q8hiiQh6hfBkUxLTQGsxoY18Ua3r2XsvAETWY",
+      video:
+        "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmaLGSyy1Q8hiiQh6hfBkUxLTQGsxoY18Ua3r2XsvAETWY",
     },
     "NO.3": {
       title: "BLACK WEB 3 | CRYPTO dAPP",
       description:
         "A decentralized application for crypto enthusiasts in the Web3 space.",
       link: "https://www.blackw3b.io/",
-      video: "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmSiQQaUMLdEzFpLUjBVa5ck8CwXsQMXKSW6EKKGyqVaNJ/blackweb.mp4",
+      video:
+        "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmSiQQaUMLdEzFpLUjBVa5ck8CwXsQMXKSW6EKKGyqVaNJ/blackweb.mp4",
     },
     "NO.4": {
       title: "CREATED 2 GROW | AGENCY WEBSITE",
       description: "A professional website for a digital growth agency.",
-      video: "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmSiQQaUMLdEzFpLUjBVa5ck8CwXsQMXKSW6EKKGyqVaNJ/created2grow.mp4",
+      video:
+        "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmSiQQaUMLdEzFpLUjBVa5ck8CwXsQMXKSW6EKKGyqVaNJ/created2grow.mp4",
       link: "https://www.created2grow.com/",
     },
     "NO.5": {
@@ -220,6 +224,56 @@ export default function Home() {
       // Handle error
     }
   };
+  const sketchRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const sketch = (p: any) => {
+      let s = 3;
+      let t = 0;
+
+      // Define the function 'a' which takes x, y, and d as arguments
+      const a = (
+        x: number,
+        y: number,
+        d = 2 * Math.cos(p.mag(x / 8 - 25, y / 8 - 25) / 3 - t)
+      ) => {
+        // Calculate k and e inside the function itself
+        const k = x / 8 - 25;
+        const e = y / 8 - 25;
+        return [x + d * k, y + d * e];
+      };
+
+      p.setup = () => {
+        let canvas = p.createCanvas(400, 400);
+        canvas.elt.style.backgroundColor = "transparent"; // Set canvas background to transparent
+        p.clear();
+        p.stroke(64, 224, 125, 191); // Note: p5.js uses 0-255 for alpha, so 0.75 * 255 ≈ 191
+        // p.noLoop(); // Stops continuous drawing, remove if animation is needed
+      };
+
+      p.draw = () => {
+        p.clear(); // Clear the canvas instead of setting a background color
+        p.randomSeed(0);
+        t += 0.02; // Increment time to animate
+
+        // Loop through x and y coordinates
+        for (let y = 100; y < 300; y += s) {
+          for (let x = 100; x < 300; x += s) {
+            // Calculate points and shuffle them before drawing lines
+            const points = [a(x, y), a(x, y + s), a(x + s, y)];
+            p.line(...p.shuffle(points).flat());
+          }
+        }
+      };
+    };
+
+    const p5Instance = sketchRef.current
+      ? new p5(sketch, sketchRef.current)
+      : null;
+    return () => {
+      p5Instance?.remove(); // Clean up when the component is unmounted
+    };
+  }, []);
 
   return (
     <div className="main-container relative h-[100vh] text-[28px] w-full flex flex-center items-start justify-start">
@@ -272,6 +326,10 @@ export default function Home() {
               01110011
             </p>
           </div>
+        </div>
+
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="relative" ref={sketchRef}></div>
         </div>
 
         <div className="section h-[100%] w-full p-[1rem] overflow-x-hidden">
@@ -425,9 +483,10 @@ export default function Home() {
             <div className="flex flex-row gap-[10px]">
               <div className="container-box  overflow-hidden scrollbar-hide relative flex flex-col items-start justify-start p-4 w-full">
                 <div className="overlay absolute w-full h-full bg-black/50  flex items-center justify-center mb-4">
-                  <button 
-                  // onClick={handleDonation}
-                  className = "mb-10 z-10 text-[18px] relative cursor-pointer">{`[ donate to view ]`}</button>
+                  <button
+                    // onClick={handleDonation}
+                    className="mb-10 z-10 text-[18px] relative cursor-pointer"
+                  >{`[ donate to view ]`}</button>
                 </div>
 
                 <div className="flex flex-col gap-[5px]  text-[12px] sm:text-[14px]  w-full ">

@@ -79,35 +79,35 @@ export default function Home() {
 
   //Hanlding hte odnation.
 
-  const handleDonation = async () => {
-    if (!address) return;
+  // const handleDonation = async () => {
+  //   if (!address) return;
 
-    try {
-      const tx = await sendTransaction({
-        to: DONATION_ADDRESS,
-        value: parseUnits(DONATION_AMOUNT, 9), // 9 decimals for SOL
-      });
+  //   try {
+  //     const tx = await sendTransaction({
+  //       to: DONATION_ADDRESS,
+  //       value: parseUnits(DONATION_AMOUNT, 9), // 9 decimals for SOL
+  //     });
 
-      // Update database
-      await fetch("/api/addUser", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          address,
-          type: "SOL",
-          amount: DONATION_AMOUNT,
-        }),
-      });
+  //     // Update database
+  //     await fetch("/api/addUser", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         address,
+  //         type: "SOL",
+  //         amount: DONATION_AMOUNT,
+  //       }),
+  //     });
 
-      // Handle success (e.g., show a success message)
-      console.log("Donation successful");
-    } catch (error) {
-      console.error("Donation failed:", error);
-      // Handle error (e.g., show error message to user)
-    }
-  };
+  //     // Handle success (e.g., show a success message)
+  //     console.log("Donation successful");
+  //   } catch (error) {
+  //     console.error("Donation failed:", error);
+  //     // Handle error (e.g., show error message to user)
+  //   }
+  // };
 
   // Add this near your other state variables
   const [donationStatus, setDonationStatus] = useState("");
@@ -426,7 +426,7 @@ export default function Home() {
               <div className="container-box  overflow-hidden scrollbar-hide relative flex flex-col items-start justify-start p-4 w-full">
                 <div className="overlay absolute w-full h-full bg-black/50  flex items-center justify-center mb-4">
                   <button 
-                  onClick={handleDonation}
+                  // onClick={handleDonation}
                   className = "mb-10 z-10 text-[18px] relative cursor-pointer">{`[ donate to view ]`}</button>
                 </div>
 

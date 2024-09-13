@@ -12,7 +12,6 @@ export async function POST(req: NextRequest) {
                 address,
                 type,
                 number: 0,
-                donationAmount: 1, // Convert to number if needed
                 donationTimestamp: new Date(),
             },
         });

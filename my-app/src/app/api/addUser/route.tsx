@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
                 address,
                 type,
                 number: 0,
-                donationAmount: parseFloat(DONATION_AMOUNT), // Convert to number if needed
+                donationAmount: 1, // Convert to number if needed
                 donationTimestamp: new Date(),
             },
         });

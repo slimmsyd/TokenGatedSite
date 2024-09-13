@@ -4,6 +4,7 @@ import { db } from "../../lib/db";
 export async function POST(req: NextRequest) {
     const body = await req.json();
     const { address, type, amount } = body;
+    const DONATION_AMOUNT ="1"
 
     try {
         const user = await db.cryptoAddress.create({
@@ -11,7 +12,7 @@ export async function POST(req: NextRequest) {
                 address,
                 type,
                 number: 0,
-                donationAmount: parseFloat(amount), // Convert to number if needed
+                donationAmount: parseFloat(DONATION_AMOUNT), // Convert to number if needed
                 donationTimestamp: new Date(),
             },
         });

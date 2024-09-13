@@ -14,6 +14,7 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { ethers, parseEther } from "ethers";
 import { useDebounce } from "use-debounce";
 import Link from "next/link";
+import format from 'date-fns/format';
 
 export default function Home() {
   const { isConnected, address } = useAccount();
@@ -77,14 +78,7 @@ export default function Home() {
     CURRENTLY: "CONTACTOR",
     POSITION: "FOUNDER, SOFTWARE ENGINEERING",
   };
-  const entries = Object.entries(personalInfo);
 
-  const changeLog = {
-    "NO.1":
-      "Add Database to store wallets that donated 90 cents in SOl || ETH || BTC",
-    "NO.2":
-      "ADD Sub Social Community for users to share posts | Sign To The Blockhain | SOL",
-  };
 
   const [showCommandPopup, setShowCommandPopup] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(0);
@@ -141,15 +135,19 @@ export default function Home() {
         insertTextAtCursor('20px');
         break;
     }
-  };
+  }; 
 
   const [articleContent, setArticleContent] = useState("");
-
+  const [articles, setArticles] = useState<{ content: string; timestamp: Date }[]>([]);
   const handleUpdateArticle = () => {
-    // Here you can add logic to save or process the article content
-    console.log("Article updated:", articleContent);
-    // You might want to send this to an API or update some other state
+    const newArticle = {
+      content: contentEditableRef.current?.innerHTML || '',
+      timestamp: new Date(),
+    };
+    setArticles(prevArticles => [...prevArticles, newArticle]);
+    if (contentEditableRef.current) contentEditableRef.current.innerHTML = '';
   };
+
 
   return (
     <div className="main-container relative h-[100vh] text-[28px] w-full flex flex-center items-start justify-start">
@@ -237,15 +235,30 @@ export default function Home() {
           <button className="block w-full text-left px-4 py-2 hover:bg-gray-100" onClick={() => handleCommandClick('header2')}>Header 2</button>
         </div>
       )}
-      <button
-        className="mt-2 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        onClick={handleUpdateArticle}
-      >
-        Update Article
-      </button>
+ 
       </div>
 
+  
+
             </div>
+
+            <button
+        className="text-[12px] sm:text-[14px]"
+        onClick={handleUpdateArticle}
+      >
+        {`[update article]`}
+      </button>
+
+      <div className="mt-4">
+        {articles.map((article, index) => (
+          <div key={`${index}-${article.timestamp.getTime()}`} className="mb-4 p-2 border border-gray-300 rounded">
+            <div className="text-[12px] sm:text-[14px]" dangerouslySetInnerHTML={{ __html: article.content }} />
+            <div className="text-[10px] text-gray-500 mt-2">
+              {format(article.timestamp, 'PPpp')}
+            </div>
+          </div>
+        ))}
+      </div>
           </div>
         </div>
       </div>

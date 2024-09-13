@@ -11,8 +11,8 @@ export async function POST(req: NextRequest) {
                 address,
                 type,
                 number: 0,
-                ...(amount !== undefined && { donationAmount: amount }),
-                ...(amount !== undefined && { donationTimestamp: new Date() }),
+                donationAmount: amount,
+                donationTimestamp: new Date(),
             },
         });
         return NextResponse.json({ success: true, user }, { status: 201 });

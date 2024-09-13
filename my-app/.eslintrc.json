@@ -5,6 +5,9 @@
     "@next/next/no-page-custom-font": "off",
     "react/jsx-key": "off"
 
+  },
+  "env": {
+    "browser": true
   }
 }
 

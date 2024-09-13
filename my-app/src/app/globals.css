@@ -112,6 +112,9 @@ button:hover,
 .border-bottom-dashed {
   border-bottom: 0.5px dashed rgba(64, 224, 125, 0.75);
 }
+.text-format{
+  border: 0.5px dashed rgba(64, 224, 125, 0.75);
+}
 
 
 @keyframes rotate {

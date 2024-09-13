@@ -16,6 +16,8 @@ import { useDebounce } from "use-debounce";
 import Popup from "./components/popup";
 import Link from "next/link";
 import Video from "./components/Video";
+import { parseUnits } from "viem";
+import { db } from "./lib/db";
 
 export default function Home() {
   const { isConnected, address } = useAccount();
@@ -70,7 +72,45 @@ export default function Home() {
     // console.log("Logging the current bal", currentBal);
   }, [currentBal]);
 
+  const DONATION_ADDRESS = "0x5AdB53ede35FC38159f7F8d33822907e0A672a52";
+  const DONATION_AMOUNT = "1"; // 1 SOL
+
   const { sendTransaction } = useSendTransaction();
+
+  //Hanlding hte odnation.
+
+  const handleDonation = async () => {
+    if (!address) return;
+
+    try {
+      const tx = await sendTransaction({
+        to: DONATION_ADDRESS,
+        value: parseUnits(DONATION_AMOUNT, 9), // 9 decimals for SOL
+      });
+
+      // Update database
+      await fetch("/api/addUser", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          address,
+          type: "SOL",
+          amount: DONATION_AMOUNT,
+        }),
+      });
+
+      // Handle success (e.g., show a success message)
+      console.log("Donation successful");
+    } catch (error) {
+      console.error("Donation failed:", error);
+      // Handle error (e.g., show error message to user)
+    }
+  };
+
+  // Add this near your other state variables
+  const [donationStatus, setDonationStatus] = useState("");
 
   //Obect containg personal informaiton
   const personalInfo = {
@@ -101,20 +141,20 @@ export default function Home() {
       description:
         "An NFT launch project on the Base Network featuring unique digital creatures.",
       link: "https://creaturecubes.art/",
-      video: "/Creatures_Cube_Nft.mov",
+      video: "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmaLGSyy1Q8hiiQh6hfBkUxLTQGsxoY18Ua3r2XsvAETWY",
     },
     "NO.3": {
       title: "BLACK WEB 3 | CRYPTO dAPP",
       description:
         "A decentralized application for crypto enthusiasts in the Web3 space.",
       link: "https://www.blackw3b.io/",
-      video: "/blackweb.mp4",
+      video: "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmSiQQaUMLdEzFpLUjBVa5ck8CwXsQMXKSW6EKKGyqVaNJ/blackweb.mp4",
     },
     "NO.4": {
       title: "CREATED 2 GROW | AGENCY WEBSITE",
       description: "A professional website for a digital growth agency.",
-      link: "https://created2grow.com/", 
-      video: "/created2grow.mp4",
+      video: "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmSiQQaUMLdEzFpLUjBVa5ck8CwXsQMXKSW6EKKGyqVaNJ/created2grow.mp4",
+      link: "https://www.created2grow.com/",
     },
     "NO.5": {
       title: "OLD PORTFOLIO | REACT APP",
@@ -136,8 +176,11 @@ export default function Home() {
     "NO.2": "LANGUAGE AS A PREDICTOR OF REALTIIY",
   };
   const changeLog = {
-    "NO.1": "Add Database to store wallets that donated 90 cents in SOl || ETH || BTC",
-    "NO.2": "ADD Sub Social Community for users to share posts | Sign To The Blockhain | SOL",
+    "NO.1":
+      "Add Database to store wallets that donated 90 cents in SOl || ETH || BTC",
+    "NO.2":
+      "ADD Sub Social Community for users to share posts | Sign To The Blockhain | SOL",
+    "NO.3": "ADD COMMUNITY FORUM FOR USERS TO DISCUSS IDEAS",
   };
 
   //Popup state
@@ -243,7 +286,9 @@ export default function Home() {
           </div> */}
 
           <div className="outer-box pt-[2rem] ">
-            <div className="banner-tag  text-[12px] sm:text-[14px]">ABOUT-ME</div>
+            <div className="banner-tag  text-[12px] sm:text-[14px]">
+              ABOUT-ME
+            </div>
 
             <div className="flex flex-row gap-[10px]">
               <div className="container-box flex flex-col items-start justify-start p-4 w-full">
@@ -267,7 +312,9 @@ export default function Home() {
               </div>
 
               <div className="w-full">
-                <div className="banner-tag  text-[12px] sm:text-[14px]">EXPERIENCE</div>
+                <div className="banner-tag  text-[12px] sm:text-[14px]">
+                  EXPERIENCE
+                </div>
 
                 <div className="container-box flex flex-col items-start justify-start p-4 w-full">
                   <div className="flex flex-col gap-[5px] text-[12px] sm:text-[14px] w-full ">
@@ -370,11 +417,19 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="outer-box pt-[2rem] ">
-            <div className="banner-tag  text-[12px] sm:text-[14px] !w-[150px]">ARTICLES</div>
+          <div className="outer-box relative pt-[2rem] ">
+            <div className="banner-tag  text-[12px] sm:text-[14px] relative !w-[150px]">
+              ARTICLES
+            </div>
 
             <div className="flex flex-row gap-[10px]">
-              <div className="container-box flex flex-col items-start justify-start p-4 w-full">
+              <div className="container-box  overflow-hidden scrollbar-hide relative flex flex-col items-start justify-start p-4 w-full">
+                <div className="overlay absolute w-full h-full bg-black/50  flex items-center justify-center mb-4">
+                  <button 
+                  onClick={handleDonation}
+                  className = "mb-10 z-10 text-[18px] relative cursor-pointer">{`[ donate to view ]`}</button>
+                </div>
+
                 <div className="flex flex-col gap-[5px]  text-[12px] sm:text-[14px]  w-full ">
                   {Object.entries(articles).map(([key, value], index) => {
                     const lastIndex = index === entries.length - 1;
@@ -392,7 +447,9 @@ export default function Home() {
               </div>
 
               <div>
-                <div className="banner-tag text-[12px] sm:text-[14px]">CONNECT</div>
+                <div className="banner-tag text-[12px] sm:text-[14px]">
+                  CONNECT
+                </div>
 
                 <div className="container-box flex flex-col items-start justify-start p-4 w-full">
                   <div className="flex flex-col gap-[5px] text-[12px] sm:text-[14px] w-full ">
@@ -448,15 +505,14 @@ export default function Home() {
             </div>
           </div>
 
-
           <div className="outer-box pt-[2rem] ">
             <div className="flex flex-row gap-[10px]">
               <div className="banner-tag  text-[12px] sm:text-[14px] !w-[150px]">
-               CHANGELOG
+                CHANGELOG
               </div>
 
               <p className=" text-[12px] sm:text-[14px]">
-                *users who have supported my work | feature to be added*
+                *you know what this is, change is the only constant*
               </p>
             </div>
 
@@ -485,13 +541,9 @@ export default function Home() {
             setPopup={setPopup}
             showPopup={popup}
             projectInfo={Object.entries(selectedProjects)[selectedProject]}
-          
           />
         )}
-      
       </div>
-
-  
     </div>
   );
 }

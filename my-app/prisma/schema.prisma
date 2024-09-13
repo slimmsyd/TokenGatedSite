@@ -12,10 +12,14 @@ datasource db {
   relationMode = "prisma"
 }
 
+// ... existing code ...
 
 model CryptoAddress {
-  id        Int      @id @default(autoincrement())
-  number    Int
-  address   String
-  type      String   // "ETH" or "SOL"
+  id                Int       @id @default(autoincrement())
+  number            Int
+  address           String    @unique
+  type              String // "ETH" or "SOL"
+  valid             Boolean   @default(false)
+  donationTimestamp DateTime?
+  donationAmount    Int
 }

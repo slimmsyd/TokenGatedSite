@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import {
   useAccount,
   useBalance,
@@ -14,7 +14,7 @@ import { useWeb3Modal } from "@web3modal/wagmi/react";
 import { ethers, parseEther } from "ethers";
 import { useDebounce } from "use-debounce";
 import Link from "next/link";
-import format from 'date-fns/format';
+import format from "date-fns/format";
 
 export default function Home() {
   const { isConnected, address } = useAccount();
@@ -79,7 +79,6 @@ export default function Home() {
     POSITION: "FOUNDER, SOFTWARE ENGINEERING",
   };
 
-
   const [showCommandPopup, setShowCommandPopup] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -95,8 +94,8 @@ export default function Home() {
       setCursorPosition(preCaretRange.toString().length);
     }
 
-    const content = contentEditableRef.current?.innerHTML || '';
-    if (content.endsWith('/')) {
+    const content = contentEditableRef.current?.innerHTML || "";
+    if (content.endsWith("/")) {
       setShowCommandPopup(true);
     } else {
       setShowCommandPopup(false);
@@ -108,14 +107,14 @@ export default function Home() {
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
       range.deleteContents();
-      
-      const span = document.createElement('span');
+
+      const span = document.createElement("span");
       span.style.fontSize = fontSize;
-      span.innerHTML = '&nbsp;';
-      
+      span.innerHTML = "&nbsp;";
+
       range.insertNode(span);
       range.collapse(false);
-      
+
       selection.removeAllRanges();
       selection.addRange(range);
     }
@@ -125,37 +124,84 @@ export default function Home() {
 
   const handleCommandClick = (command: string) => {
     switch (command) {
-      case 'paragraph':
-        insertTextAtCursor('14px');
+      case "paragraph":
+        insertTextAtCursor("14px");
         break;
-      case 'header1':
-        insertTextAtCursor('24px');
+      case "header1":
+        insertTextAtCursor("24px");
         break;
-      case 'header2':
-        insertTextAtCursor('20px');
+      case "header2":
+        insertTextAtCursor("20px");
         break;
     }
-  }; 
-
-  const [articleContent, setArticleContent] = useState("");
-  const [articles, setArticles] = useState<{ content: string; timestamp: Date }[]>([]);
-  const handleUpdateArticle = () => {
-    const newArticle = {
-      content: contentEditableRef.current?.innerHTML || '',
-      timestamp: new Date(),
-    };
-    setArticles(prevArticles => [...prevArticles, newArticle]);
-    if (contentEditableRef.current) contentEditableRef.current.innerHTML = '';
   };
 
+  const [articleContent, setArticleContent] = useState("");
+  const [articles, setArticles] = useState<
+    Array<{ content: string; timestamp: Date; upvotes: number }>
+  >([]);
+
+  const handleUpvote = (index: number) => {
+    setArticles((prevArticles) =>
+      prevArticles.map((article, i) =>
+        i === index
+          ? { ...article, upvotes: (article.upvotes || 0) + 1 }
+          : article
+      )
+    );
+  };
+
+  const handleDonate = (address: string) => {
+    // Implement donation logic here
+    console.log(`Donating to address: ${address}`);
+  };
+
+  const handleUpdateArticle = () => {
+    const content = contentEditableRef.current?.innerHTML || "";
+    const textContent = content.replace(/<[^>]*>/g, "").trim(); // Remove HTML tags and trim
+
+    const hasImage = content.includes("<img");
+
+    if (textContent.length < 4 && !hasImage) {
+      alert("Your post must contain at least 5 characters or an image.");
+      return;
+    }
+
+    const newArticle = {
+      content: contentEditableRef.current?.innerHTML || "",
+      timestamp: new Date(),
+      upvotes: 0,
+    };
+    setArticles((prevArticles) => [...prevArticles, newArticle]);
+    if (contentEditableRef.current) contentEditableRef.current.innerHTML = "";
+  };
+  const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = document.createElement("img");
+        img.src = event.target?.result as string;
+        img.style.maxWidth = "100%";
+        contentEditableRef.current?.appendChild(img);
+      };
+      reader.readAsDataURL(file);
+    }
+  }, []);
+
+  const truncateAddress = (address: string) => {
+    if (address.length <= 6) return address;
+    return `${address.slice(0, 6)}...`;
+  };
 
   return (
-    <div className="main-container relative h-[100vh] text-[28px] w-full flex flex-center items-start justify-start">
-      <div className="flex flex-col relative sm:overflow-hidden overflow-auto overflow-x-hidden">
+  <div className="main-container relative h-[100vh] text-[28px] w-full flex flex-center items-start justify-start">
+    <div className="flex flex-col relative sm:overflow-hidden overflow-auto overflow-x-hidden">
         <div className="flex flex-col gap-[25px] md:flex-row items-center px-[1rem]">
-          <span className="w-[200px] ">
+          <Link href = "/" className="w-[200px] ">
             <img src="asciart.png" />
-          </span>
+          </Link>
 
           <div className="flex flex-col gap-[10px] text-center md:text-left md:items-start items-center">
             <h1 className="text-[18px]">hello metaverse</h1>
@@ -215,50 +261,86 @@ export default function Home() {
             </div>
 
             <div className="flex flex-row gap-[10px]">
-            <div className="container-box flex flex-col items-start justify-start p-1 w-full relative">
-      <div
-        ref={contentEditableRef}
-        contentEditable
-        className="w-full h-[200px] p-2 text-[12px] sm:text-[14px] outline-none bg-transparent overflow-auto"
-        onInput={handleTextareaChange}
-        onKeyDown={(e) => {
-          if (e.key === '/' && !showCommandPopup) {
-            e.preventDefault();
-            setShowCommandPopup(true);
-          }
-        }}
-      />
-      {showCommandPopup && (
-        <div className="absolute bottom-12 left-0 bg-white border border-gray-300 rounded shadow-lg">
-          <button className="block w-full text-left px-4 py-2 hover:bg-gray-100" onClick={() => handleCommandClick('paragraph')}>Paragraph</button>
-          <button className="block w-full text-left px-4 py-2 hover:bg-gray-100" onClick={() => handleCommandClick('header1')}>Header 1</button>
-          <button className="block w-full text-left px-4 py-2 hover:bg-gray-100" onClick={() => handleCommandClick('header2')}>Header 2</button>
-        </div>
-      )}
- 
-      </div>
-
-  
-
+              <div className="container-box flex flex-col items-start justify-start p-1 w-full relative">
+                <div
+                  ref={contentEditableRef}
+                  contentEditable
+                  className="w-full h-[200px] p-2 text-[12px] sm:text-[14px] outline-none bg-transparent overflow-auto"
+                  onInput={handleTextareaChange}
+                  onKeyDown={(e) => {
+                    if (e.key === "/" && !showCommandPopup) {
+                      e.preventDefault();
+                      setShowCommandPopup(true);
+                    }
+                  }}
+                  onDrop={handleDrop}
+                  onDragOver={(e) => e.preventDefault()}
+                />
+                {showCommandPopup && (
+                  <div className="absolute text-format bottom-12 left-0 border border-gray-300 rounded shadow-lg">
+                    <button
+                      className="block w-full text-left  px-4 py-2 hover:bg-gray-100"
+                      onClick={() => handleCommandClick("paragraph")}
+                    >
+                      Paragraph
+                    </button>
+                    <button
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                      onClick={() => handleCommandClick("header1")}
+                    >
+                      Header 1
+                    </button>
+                    <button
+                      className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                      onClick={() => handleCommandClick("header2")}
+                    >
+                      Header 2
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
 
             <button
-        className="text-[12px] sm:text-[14px]"
-        onClick={handleUpdateArticle}
-      >
-        {`[update article]`}
-      </button>
+              className="text-[12px] sm:text-[14px]"
+              onClick={handleUpdateArticle}
+            >
+              {`[update article]`}
+            </button>
 
-      <div className="mt-4">
-        {articles.map((article, index) => (
-          <div key={`${index}-${article.timestamp.getTime()}`} className="mb-4 p-2 border border-gray-300 rounded">
-            <div className="text-[12px] sm:text-[14px]" dangerouslySetInnerHTML={{ __html: article.content }} />
-            <div className="text-[10px] text-gray-500 mt-2">
-              {format(article.timestamp, 'PPpp')}
+            <div className="mt-4">
+              {[...articles].reverse().map((article, index) => (
+                <div
+                  key={`${index}-${article.timestamp.getTime()}`}
+                  className="mb-4 p-2 border border-gray-300 border-dashed rounded"
+                >
+                  <div
+                    className="text-[12px] sm:text-[14px]"
+                    dangerouslySetInnerHTML={{ __html: article.content }}
+                  />
+                  <div className="text-[10px] text-gray-500 mt-2">
+                    {format(article.timestamp, "PPpp")}
+                  </div>
+                  <div className="mt-2 flex justify-between items-center">
+                    <button
+                      onClick={() => handleUpvote(articles.length - 1 - index)}
+                      className="text-[12px] border border-gray-300 px-2 py-1 rounded"
+                    >
+                      UPVOTE ({article.upvotes || 0})
+                    </button>
+                    <button
+                      onClick={() => handleDonate("user_address_here")}
+                      className="text-[12px] border border-gray-300 px-2 py-1 rounded flex flex-row items-center gap-[10px]"
+                    >
+                      <span>
+                        {address ? truncateAddress(address) : "DONATE"}
+                      </span>{" "}
+                      | Donate
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
-          </div>
-        ))}
-      </div>
           </div>
         </div>
       </div>

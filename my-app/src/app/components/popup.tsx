@@ -24,7 +24,7 @@ export default function Popup({
 
   return (
     <div className="flex h-[100%] w-full items-center justify-center absolute popup">
-      <div className="container-box no-border !h-full flex flex-col items-start justify-center p-4  top-0 ">
+      <div className="container-box no-border !h-full flex flex-col items-center justify-center p-4  top-0 ">
         <button
           onClick={() => setPopup(false)}
           className=" cursor-pointer banner-tag text-[14px]"

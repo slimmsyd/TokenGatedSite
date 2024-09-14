@@ -32,8 +32,8 @@ export default function Popup({
           {"EXIT()"}
         </button>
 
-        <div className="flex flex-col gap-[25px] md:flex-row items-center  container-border">
-          <div className="flex flex-col ">
+        <div className="flex flex-col gap-[25px] w-[90%] md:w-[100%] md:flex-row items-center  container-border">
+          <div className="flex flex-col w-[100%]">
             <div className="p-3 border-bottom-dashed text-[20px]">
               <span>{value.title} </span>
             </div>

@@ -328,9 +328,9 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-full h-full flex items-center justify-center">
+        {/* <div className="w-full h-full flex items-center justify-center">
           <div className="relative" ref={sketchRef}></div>
-        </div>
+        </div> */}
 
         <div className="section h-[100%] w-full p-[1rem] overflow-x-hidden">
           <div className="flex flex-row">

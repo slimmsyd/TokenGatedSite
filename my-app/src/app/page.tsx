@@ -18,7 +18,10 @@ import Link from "next/link";
 import Video from "./components/Video";
 import { parseUnits } from "viem";
 import { db } from "./lib/db";
-import p5 from "p5";
+import dynamic from 'next/dynamic';
+
+// Dynamically import p5 with ssr option set to false
+const p5 = dynamic(() => import('p5').then((p5) => ({ default: (props: any) => <div ref={props.ref} /> })), { ssr: false });
 
 export default function Home() {
   const { isConnected, address } = useAccount();
@@ -267,12 +270,17 @@ export default function Home() {
         }
       };
     };
+    let p5Instance: any;
 
-    const p5Instance = sketchRef.current
-      ? new p5(sketch, sketchRef.current)
-      : null;
+    import('p5').then((p5Module) => {
+      const p5 = p5Module.default;
+      p5Instance = new p5(sketch, sketchRef.current as HTMLElement);
+    });
+  
     return () => {
-      p5Instance?.remove(); // Clean up when the component is unmounted
+      if (p5Instance) {
+        p5Instance.remove();
+      }
     };
   }
   }, []);

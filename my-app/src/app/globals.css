@@ -116,6 +116,10 @@ button:hover,
   border: 0.5px dashed rgba(64, 224, 125, 0.75);
 }
 
+#defaultCanvas1{
+  display: none;
+}
+
 
 @keyframes rotate {
   from {

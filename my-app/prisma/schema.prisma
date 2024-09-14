@@ -12,6 +12,9 @@ datasource db {
   relationMode = "prisma"
 }
 
+
+
+
 // ... existing code ...
 
 model CryptoAddress {

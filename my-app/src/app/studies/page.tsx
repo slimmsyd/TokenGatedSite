@@ -105,6 +105,8 @@ export default function Home() {
   };
 
   const insertTextAtCursor = (fontSize: string) => {
+
+    if(typeof window !== 'undefined'){
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
@@ -122,6 +124,7 @@ export default function Home() {
     }
     setShowCommandPopup(false);
     contentEditableRef.current?.focus();
+  }
   };
 
   const handleCommandClick = (command: string) => {

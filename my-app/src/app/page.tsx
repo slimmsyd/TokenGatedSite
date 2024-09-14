@@ -285,6 +285,28 @@ export default function Home() {
   }
   }, []);
 
+  const [text, setText] = useState('');
+  const [wordIndex, setWordIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const words = ["Hello", "World", "Friend", "Welcome", "to", "the", "metaverse", "click", "to", "continue"];
+
+  useEffect(() => {
+    const currentWord = words[wordIndex];
+    const shouldSwitch = isDeleting ? text === '' : text === currentWord;
+
+    if (shouldSwitch) {
+      setIsDeleting(!isDeleting);
+      if (!isDeleting) setWordIndex((prev) => (prev + 1) % words.length);
+    }
+
+    const timeout = setTimeout(() => {
+      setText(prev => isDeleting ? prev.slice(0, -1) : currentWord.slice(0, prev.length + 1));
+    }, isDeleting ? 120 : 120);
+
+    return () => clearTimeout(timeout);
+  }, [text, isDeleting, wordIndex]);
+
+
   return (
     <div className="main-container relative h-[100vh] text-[28px] w-full flex flex-center items-start justify-start">
       <div className="flex flex-col relative sm:overflow-hidden overflow-auto overflow-x-hidden">
@@ -338,20 +360,20 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="w-full h-full flex items-center justify-center">
-          <div className="relative" ref={sketchRef}></div>
+        <div className="w-full h-[300px] flex items-center justify-center relative ">
+
+          <div className = "absolute top-0 left-0 w-full h-full flex items-center justify-center z-10">
+            <div className ="cursor-pointer">{text}</div>
+          </div>
+
+          <div className="relative opacity-50" ref={sketchRef}></div>
+
         </div>
 
         <div className="section h-[100%] w-full p-[1rem] overflow-x-hidden">
           <div className="flex flex-row">
             <button className="text-[20px]">{"[ welcome ]"}</button>
           </div>
-
-          {/* <div className="flex flex-row items-center justify-center h-fuzll w-full">
-            <span className="w-[200px] h-[200px]">
-              <img src="art_asci.png" />
-            </span>
-          </div> */}
 
           <div className="outer-box pt-[2rem] ">
             <div className="banner-tag  text-[12px] sm:text-[14px]">

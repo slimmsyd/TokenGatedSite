@@ -84,61 +84,61 @@ export default function Home() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const contentEditableRef = useRef<HTMLDivElement>(null);
 
-  const handleTextareaChange = () => {
-    if(typeof window !== 'undefined'){
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      const preCaretRange = range.cloneRange();
-      preCaretRange.selectNodeContents(contentEditableRef.current!);
-      preCaretRange.setEnd(range.endContainer, range.endOffset);
-      setCursorPosition(preCaretRange.toString().length);
-    }
+  // const handleTextareaChange = () => {
+  //   if(typeof window !== 'undefined'){
+  //   const selection = window.getSelection();
+  //   if (selection && selection.rangeCount > 0) {
+  //     const range = selection.getRangeAt(0);
+  //     const preCaretRange = range.cloneRange();
+  //     preCaretRange.selectNodeContents(contentEditableRef.current!);
+  //     preCaretRange.setEnd(range.endContainer, range.endOffset);
+  //     setCursorPosition(preCaretRange.toString().length);
+  //   }
 
-    }
-    const content = contentEditableRef.current?.innerHTML || "";
-    if (content.endsWith("/")) {
-      setShowCommandPopup(true);
-    } else {
-      setShowCommandPopup(false);
-    }
-  };
+  //   }
+  //   const content = contentEditableRef.current?.innerHTML || "";
+  //   if (content.endsWith("/")) {
+  //     setShowCommandPopup(true);
+  //   } else {
+  //     setShowCommandPopup(false);
+  //   }
+  // };
 
-  const insertTextAtCursor = (fontSize: string) => {
+  // const insertTextAtCursor = (fontSize: string) => {
 
-    if(typeof window !== 'undefined'){
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      range.deleteContents();
+  //   if(typeof window !== 'undefined'){
+  //   const selection = window.getSelection();
+  //   if (selection && selection.rangeCount > 0) {
+  //     const range = selection.getRangeAt(0);
+  //     range.deleteContents();
 
-      const span = document.createElement("span");
-      span.style.fontSize = fontSize;
-      span.innerHTML = "&nbsp;";
+  //     const span = document.createElement("span");
+  //     span.style.fontSize = fontSize;
+  //     span.innerHTML = "&nbsp;";
 
-      range.insertNode(span);
-      range.collapse(false);
+  //     range.insertNode(span);
+  //     range.collapse(false);
 
-      selection.removeAllRanges();
-      selection.addRange(range);
-    }
-    setShowCommandPopup(false);
-    contentEditableRef.current?.focus();
-  }
-  };
+  //     selection.removeAllRanges();
+  //     selection.addRange(range);
+  //   }
+  //   setShowCommandPopup(false);
+  //   contentEditableRef.current?.focus();
+  // }
+  // };
 
   const handleCommandClick = (command: string) => {
-    switch (command) {
-      case "paragraph":
-        insertTextAtCursor("14px");
-        break;
-      case "header1":
-        insertTextAtCursor("24px");
-        break;
-      case "header2":
-        insertTextAtCursor("20px");
-        break;
-    }
+    // switch (command) {
+    //   case "paragraph":
+    //     insertTextAtCursor("14px");
+    //     break;
+    //   case "header1":
+    //     insertTextAtCursor("24px");
+    //     break;
+    //   case "header2":
+    //     insertTextAtCursor("20px");
+    //     break;
+    // }
   };
 
   const [articleContent, setArticleContent] = useState("");
@@ -271,7 +271,7 @@ export default function Home() {
                   ref={contentEditableRef}
                   contentEditable
                   className="w-full h-[200px] p-2 text-[12px] sm:text-[14px] outline-none bg-transparent overflow-auto"
-                  onInput={handleTextareaChange}
+                  // onInput={handleTextareaChange}
                   onKeyDown={(e) => {
                     if (e.key === "/" && !showCommandPopup) {
                       e.preventDefault();

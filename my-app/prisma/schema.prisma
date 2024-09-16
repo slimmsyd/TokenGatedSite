@@ -18,3 +18,4 @@ model CryptoAddress {
   donationAmount    Float?
   transactionHash  String?   // <-- Add this field
 }
+

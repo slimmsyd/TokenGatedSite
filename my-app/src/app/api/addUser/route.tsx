@@ -10,19 +10,20 @@ export async function POST(req: NextRequest) {
     
     console.log("address", address)
     console.log("transactionHash", transactionHash)
-    // Validate input
-    if (!address || !transactionHash) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
-    }
-
+     // Validate input: Address is required, but transactionHash is optional
+     if (!address) {
+        return NextResponse.json({ error: "Address is required" }, { status: 400 });
+      }
+  
     // Add user to the database
     await db.cryptoAddress.create({
-      data: {
-        address,
-        type: 'ETH', // Add a default value or get it from the request
-      } ,
-    }) as any;
-
+        data: {
+          address,
+          type: 'ETH',
+          transactionHash: transactionHash || undefined, // Only add if present
+        },
+      });
+      
     return NextResponse.json({ success: true }, { status: 201 });
   } catch (error) {
     console.error("Error adding user:", error);

@@ -20,8 +20,8 @@ export async function POST(req: NextRequest) {
       data: {
         address,
         type: 'ETH', // Add a default value or get it from the request
-      },
-    });
+      } ,
+    }) as any;
 
     return NextResponse.json({ success: true }, { status: 201 });
   } catch (error) {

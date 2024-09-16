@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "../../lib/db";
 
+
+interface CryptoAddressCreateInput {
+    address: string;
+    transactionHash?: string;
+    // other properties...
+  }
+  
 export async function POST(req: NextRequest) {
   try {
     // Parse the request body
@@ -14,14 +21,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    // Add user to the database
-    await db.cryptoAddress.create({
-      data: {
-        address,
-        transactionHash: transactionHash as unknown as string, // Use type assertion to bypass the error
-        type: 'ETH', // Add a default value or get it from the request
-      },
-    });
+ // Create the base data object
+ const data: any = {
+    address,
+    type: 'ETH', // Add a default value or get it from the request
+  };
+
+  // Conditionally add transactionHash if it exists
+  if (transactionHash) {
+    data.transactionHash = transactionHash;
+  }
+
+  // Add user to the database
+  await db.cryptoAddress.create({
+    data,
+  });
 
     return NextResponse.json({ success: true }, { status: 201 });
   } catch (error) {

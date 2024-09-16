@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     await db.cryptoAddress.create({
       data: {
         address,
-        transactionHash,
+        transactionHash: transactionHash as unknown as string, // Use type assertion to bypass the error
         type: 'ETH', // Add a default value or get it from the request
       },
     });

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 const { Configuration, OpenAI } = require("openai");
 
-const APIKEY = process.env.OPENAI_API_KEY;
-console.log("Loggign API Key", APIKEY)
-const openai = new OpenAI({ apiKey: APIKEY });
+const apiKey = process.env.OPENAI_API_KEY;
+
+const openai = new OpenAI({ apiKey: apiKey });
 
 export async function POST(request: NextRequest) {
   try {

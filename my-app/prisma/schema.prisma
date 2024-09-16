@@ -11,8 +11,8 @@ datasource db {
 
 model CryptoAddress {
   id                Int       @id @default(autoincrement())
-  address           String    @unique
-  type              String
+  address           String?    @unique
+  type              String?
   valid             Boolean   @default(false)
   donationTimestamp DateTime?
   donationAmount    Float?

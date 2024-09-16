@@ -19,7 +19,6 @@ export async function POST(req: NextRequest) {
       data: {
         address,
         transactionHash,
-        number: 0, // Add a default value or get it from the request
         type: 'ETH', // Add a default value or get it from the request
       },
     });

@@ -22,9 +22,10 @@ export async function POST(req: NextRequest) {
     }
 
  // Create the base data object
- const data: any = {
+ const data = {
     address,
-    type: 'ETH', // Add a default value or get it from the request
+    type: 'ETH',
+    transactionHash: transactionHash as string
   };
 
   // Conditionally add transactionHash if it exists

@@ -18,12 +18,22 @@ import Link from "next/link";
 import Video from "./components/Video";
 import { parseUnits } from "viem";
 import { db } from "./lib/db";
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
+import Chatbox from "./components/chatbox";
+import Web3 from "web3";``
 
 // Dynamically import p5 with ssr option set to false
-const p5 = dynamic(() => import('p5').then((p5) => ({ default: (props: any) => <div ref={props.ref} /> })), { ssr: false });
+const p5 = dynamic(
+  () =>
+    import("p5").then((p5) => ({
+      default: (props: any) => <div ref={props.ref} />,
+    })),
+  { ssr: false }
+);
 
 export default function Home() {
+
+  const web3 = new Web3(`https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`);
   const { isConnected, address } = useAccount();
   const [connectedAddress, setConnectedAddress] = useState<string | undefined>(
     undefined
@@ -76,45 +86,128 @@ export default function Home() {
     // console.log("Logging the current bal", currentBal);
   }, [currentBal]);
 
-  const DONATION_ADDRESS = "0x5AdB53ede35FC38159f7F8d33822907e0A672a52";
-  const DONATION_AMOUNT = "1"; // 1 SOL
+  const DONATION_ADDRESS = "0xDcFD8d5BD36667D16aDDD211C59BCdE1A9c4e23B";
+  const DONATION_AMOUNT = "0.0001"; // 1 SOL
 
   const { sendTransaction } = useSendTransaction();
 
   //Hanlding hte odnation.
 
-  // const handleDonation = async () => {
-  //   if (!address) return;
-
-  //   try {
-  //     const tx = await sendTransaction({
-  //       to: DONATION_ADDRESS,
-  //       value: parseUnits(DONATION_AMOUNT, 9), // 9 decimals for SOL
-  //     });
-
-  //     // Update database
-  //     await fetch("/api/addUser", {
-  //       method: "POST",
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //       body: JSON.stringify({
-  //         address,
-  //         type: "SOL",
-  //         amount: DONATION_AMOUNT,
-  //       }),
-  //     });
-
-  //     // Handle success (e.g., show a success message)
-  //     console.log("Donation successful");
-  //   } catch (error) {
-  //     console.error("Donation failed:", error);
-  //     // Handle error (e.g., show error message to user)
-  //   }
-  // };
-
   // Add this near your other state variables
-  const [donationStatus, setDonationStatus] = useState("");
+  const [donationStatus, setDonationStatus] = useState<boolean>(false);
+  const waitForTransactionReceipt = useWaitForTransactionReceipt();
+  const [donationHash, setDonationHash] = useState<string | null>(null);
+
+  const handleDonation = async () => {
+    try {
+
+      const provider = new ethers.BrowserProvider(window.ethereum);
+    
+      // Request account access if needed
+      await provider.send("eth_requestAccounts", []);
+      
+      // Get the signer
+      const signer = await provider.getSigner();
+  
+      const tx = {
+        to: DONATION_ADDRESS,
+        value: parseEther(DONATION_AMOUNT)
+      };
+  
+      // Send the transaction
+      const transaction = await signer.sendTransaction(tx);
+      
+
+      const receipt = await transaction.wait();
+
+
+      // console.log("Transaction successful with hash:", receipt)
+      setDonationHash(receipt?.blockHash || "")
+      if(receipt?.blockHash !== null || receipt?.blockHash !== undefined || receipt?.blockHash !== ""){
+
+        setDonationStatus(true)
+        console.log("Donation status", donationStatus)
+
+    } 
+  }catch(error){
+    console.log("Error donating", error)
+  }
+
+}
+//Add the user to the databse 
+
+ async function addUserToDatabase(address: string, donationHash: string){
+  try{
+    const response = await fetch('/api/addUser', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ address, transactionHash: donationHash }),
+    })
+
+    console.log("Response", response)
+  }catch(error){
+    console.error('Error adding user:', error);
+  }
+}
+
+
+
+
+
+useEffect(() => {
+
+  console.log("Donation status", donationStatus)
+  if(donationStatus){
+    console.log("Donation status in if", donationStatus)
+    addUserToDatabase(address as string, donationHash || "")
+  }
+
+}, [donationStatus])
+
+
+const [users, setUsers] = useState<any[]>([]);
+const getUsers = async () => {
+  const response = await fetch('/api/getUsers', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+
+  const data = await response.json();
+  console.log("Data", data)
+  setUsers(data);
+}
+
+useEffect(() => {
+  getUsers();
+
+}, []);
+
+useEffect(() => {
+  console.log("Users", users)
+}, [users])
+
+  const isAddressInUsers = (address: string) => {
+
+
+    if(address === null || address === undefined || address === ""){  
+      return false
+    }else{
+      return users.some(user => user.address.toLowerCase() === address.toLowerCase());
+    }
+  };
+
+  useEffect(() => {
+    if (address) {
+      const addressExists = isAddressInUsers(address);
+      console.log(`Address ${address} exists in users: ${addressExists}`);
+    }
+  }, [address, users]);
+
 
   //Obect containg personal informaiton
   const personalInfo = {
@@ -230,85 +323,106 @@ export default function Home() {
   const sketchRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {        
+    if (typeof window !== "undefined") {
       const sketch = (p: any) => {
         let s = 3;
-      let t = 0;
+        let t = 0;
 
-      // Define the function 'a' which takes x, y, and d as arguments
-      const a = (
-        x: number,
-        y: number,
-        d = 2 * Math.cos(p.mag(x / 8 - 25, y / 8 - 25) / 3 - t)
-      ) => {
-        // Calculate k and e inside the function itself
-        const k = x / 8 - 25;
-        const e = y / 8 - 25;
-        return [x + d * k, y + d * e];
-      };
+        // Define the function 'a' which takes x, y, and d as arguments
+        const a = (
+          x: number,
+          y: number,
+          d = 2 * Math.cos(p.mag(x / 8 - 25, y / 8 - 25) / 3 - t)
+        ) => {
+          // Calculate k and e inside the function itself
+          const k = x / 8 - 25;
+          const e = y / 8 - 25;
+          return [x + d * k, y + d * e];
+        };
 
-      p.setup = () => {
-        let canvas = p.createCanvas(400, 400);
-        canvas.elt.style.backgroundColor = "transparent"; // Set canvas background to transparent
-        p.clear();
-        p.stroke(64, 224, 125, 191); // Note: p5.js uses 0-255 for alpha, so 0.75 * 255 ≈ 191
-        // p.noLoop(); // Stops continuous drawing, remove if animation is needed
-      };
+        p.setup = () => {
+          let canvas = p.createCanvas(400, 400);
+          canvas.elt.style.backgroundColor = "transparent"; // Set canvas background to transparent
+          p.clear();
+          p.stroke(64, 224, 125, 191); // Note: p5.js uses 0-255 for alpha, so 0.75 * 255 ≈ 191
+          // p.noLoop(); // Stops continuous drawing, remove if animation is needed
+        };
 
-      p.draw = () => {
-        p.clear(); // Clear the canvas instead of setting a background color
-        p.randomSeed(0);
-        t += 0.02; // Increment time to animate
+        p.draw = () => {
+          p.clear(); // Clear the canvas instead of setting a background color
+          p.randomSeed(0);
+          t += 0.02; // Increment time to animate
 
-        // Loop through x and y coordinates
-        for (let y = 100; y < 300; y += s) {
-          for (let x = 100; x < 300; x += s) {
-            // Calculate points and shuffle them before drawing lines
-            const points = [a(x, y), a(x, y + s), a(x + s, y)];
-            p.line(...p.shuffle(points).flat());
+          // Loop through x and y coordinates
+          for (let y = 100; y < 300; y += s) {
+            for (let x = 100; x < 300; x += s) {
+              // Calculate points and shuffle them before drawing lines
+              const points = [a(x, y), a(x, y + s), a(x + s, y)];
+              p.line(...p.shuffle(points).flat());
+            }
           }
+        };
+      };
+      let p5Instance: any;
+
+      import("p5").then((p5Module) => {
+        const p5 = p5Module.default;
+        p5Instance = new p5(sketch, sketchRef.current as HTMLElement);
+      });
+
+      return () => {
+        if (p5Instance) {
+          p5Instance.remove();
         }
       };
-    };
-    let p5Instance: any;
-
-    import('p5').then((p5Module) => {
-      const p5 = p5Module.default;
-      p5Instance = new p5(sketch, sketchRef.current as HTMLElement);
-    });
-  
-    return () => {
-      if (p5Instance) {
-        p5Instance.remove();
-      }
-    };
-  }
+    }
   }, []);
 
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
   const [wordIndex, setWordIndex] = useState(0);
   const [isDeleting, setIsDeleting] = useState(false);
-  const words = ["Hello", "World", "Friend", "Welcome", "to", "the", "metaverse", "click", "to", "continue"];
+  const words = [
+    "Hello",
+    "World",
+    "Friend",
+    "Welcome",
+    "to",
+    "the",
+    "metaverse",
+    "click",
+    "to",
+    "continue",
+  ];
 
   useEffect(() => {
     const currentWord = words[wordIndex];
-    const shouldSwitch = isDeleting ? text === '' : text === currentWord;
+    const shouldSwitch = isDeleting ? text === "" : text === currentWord;
 
     if (shouldSwitch) {
       setIsDeleting(!isDeleting);
       if (!isDeleting) setWordIndex((prev) => (prev + 1) % words.length);
     }
 
-    const timeout = setTimeout(() => {
-      setText(prev => isDeleting ? prev.slice(0, -1) : currentWord.slice(0, prev.length + 1));
-    }, isDeleting ? 120 : 120);
+    const timeout = setTimeout(
+      () => {
+        setText((prev) =>
+          isDeleting ? prev.slice(0, -1) : currentWord.slice(0, prev.length + 1)
+        );
+      },
+      isDeleting ? 120 : 120
+    );
 
     return () => clearTimeout(timeout);
   }, [text, isDeleting, wordIndex]);
 
+  const [showChat, setShowChat] = useState<boolean>(false);
 
   return (
-    <div className="main-container relative h-[100vh] text-[28px] w-full flex flex-center items-start justify-start">
+    <div className="main-container  h-[100vh] text-[28px] w-full flex flex-center items-start justify-start">
+      {showChat ? (
+        <Chatbox showChat={showChat} setShowChat={setShowChat} />
+      ) : null}
+
       <div className="flex flex-col relative sm:overflow-hidden overflow-auto overflow-x-hidden">
         <div className="flex flex-col gap-[25px] md:flex-row items-center px-[1rem]">
           <span className="w-[200px] ">
@@ -361,13 +475,16 @@ export default function Home() {
         </div>
 
         <div className="w-full h-[300px] flex items-center justify-center relative ">
-
-          <div className = "absolute top-0 left-0 w-full h-full flex items-center justify-center z-10">
-            <div className ="cursor-pointer">{text}</div>
+          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center z-10">
+            <div
+              onClick={() => setShowChat(!showChat)}
+              className="cursor-pointer"
+            >
+              {text}
+            </div>
           </div>
 
           <div className="relative opacity-50" ref={sketchRef}></div>
-
         </div>
 
         <div className="section h-[100%] w-full p-[1rem] overflow-x-hidden">
@@ -514,13 +631,14 @@ export default function Home() {
 
             <div className="flex flex-row gap-[10px]">
               <div className="container-box  overflow-hidden scrollbar-hide relative flex flex-col items-start justify-start p-4 w-full">
-                <div className="overlay absolute w-full h-full bg-black/50  flex items-center justify-center mb-4">
-                  <button
-                    // onClick={handleDonation}
-                    className="mb-10 z-10 text-[18px] relative cursor-pointer"
-                  >{`[ donate to view ]`}</button>
-                </div>
-
+                {isAddressInUsers(address as string) ? (
+                 null
+                ) :  <div className="overlay absolute w-full h-full bg-black/50  flex items-center justify-center mb-4">
+                <button
+                onClick={handleDonation}
+                className="mb-10 z-10 text-[18px] relative cursor-pointer"
+              >{`[ donate to view ]`}</button>
+            </div>}
                 <div className="flex flex-col gap-[5px]  text-[12px] sm:text-[14px]  w-full ">
                   {Object.entries(articles).map(([key, value], index) => {
                     const lastIndex = index === entries.length - 1;
@@ -579,7 +697,7 @@ export default function Home() {
             <div className="flex flex-row gap-[10px]">
               <div className="container-box flex flex-col items-start justify-start p-4 w-full">
                 <div className="flex flex-col gap-[5px]  text-[12px] sm:text-[14px] w-full ">
-                  {Object.entries(articles).map(([key, value], index) => {
+                  {Object.entries(users).map(([key, value], index) => {
                     const lastIndex = index === entries.length - 1;
 
                     return (

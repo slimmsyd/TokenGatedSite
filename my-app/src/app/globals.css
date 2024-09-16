@@ -141,3 +141,14 @@ button:hover,
   filter: brightness(1.2);
 
 }
+
+.submitBtn:hover{
+background: auto !important; 
+cursor: pointer !important;
+
+}
+
+.submitBtn{
+  background: auto !important; 
+  cursor: pointer !important;
+}

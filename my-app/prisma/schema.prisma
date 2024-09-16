@@ -1,28 +1,21 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider     = "postgresql" // Changed from sqlite to postgresql
+  provider     = "postgresql"
   url          = env("DATABASE_URL")
   directUrl    = env("DIRECT_URL")
   relationMode = "prisma"
 }
 
-
-
-
-// ... existing code ...
-
 model CryptoAddress {
   id                Int       @id @default(autoincrement())
   number            Int
   address           String    @unique
-  type              String // "ETH" or "SOL"
+  type              String
   valid             Boolean   @default(false)
   donationTimestamp DateTime?
   donationAmount    Float?
+  transactionHash   String?   @unique
 }

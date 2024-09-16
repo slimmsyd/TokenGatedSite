@@ -705,7 +705,7 @@ useEffect(() => {
                         className={`pl-[5px] flex flex-row gap-[10px] btn-hover
     }`}
                       >
-                        {key} | {address}
+                        {key} | {value.address}
                       </div>
                     );
                   })}

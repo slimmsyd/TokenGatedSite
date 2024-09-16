@@ -16,5 +16,5 @@ model CryptoAddress {
   valid             Boolean   @default(false)
   donationTimestamp DateTime?
   donationAmount    Float?
-  transactionHash   String?   // This should be included in your schema
+  transactionHash   String   // This should be included in your schema
 }

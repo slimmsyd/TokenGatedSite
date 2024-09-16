@@ -17,5 +17,5 @@ model CryptoAddress {
   valid             Boolean   @default(false)
   donationTimestamp DateTime?
   donationAmount    Float?
-  transactionHash   String?   @unique
+  transactionHash   String  @unique
 }

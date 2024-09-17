@@ -17,5 +17,6 @@ model CryptoAddress {
   donationTimestamp DateTime?
   donationAmount    Float?
   transactionHash  String?   // <-- Add this field
+  questionsAsked    Int?      @default(0)
 }
 

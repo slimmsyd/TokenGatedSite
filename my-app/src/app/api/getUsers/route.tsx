@@ -6,6 +6,10 @@ export async function GET() {
       select: {
         id: true,
         address: true,
+        valid: true,
+        donationTimestamp: true,
+        donationAmount: true,
+        transactionHash: true,
       },
     });
 

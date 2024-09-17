@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import ChatMessage from "./chatMessage";
 import LoadingComponent from "./loadingComponent";
+import { useAccount } from "wagmi";
 
 interface ChatMessage {
   question?: string;
@@ -20,20 +21,73 @@ interface ChatMessageProps {
   setShowChat: (showChat: boolean) => void;
 }
 
-export default function Chatbox({showChat, setShowChat}: ChatMessageProps) {
+export default function Chatbox({ showChat, setShowChat }: ChatMessageProps) {
   const [message, setMessage] = useState<string>("");
   const [responses, setResponses] = useState<ResponseObject[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { address } = useAccount();
+  const [users, setUsers] = useState<any[]>([]);
+  const [isUserValid, setIsUserValid] = useState<boolean>(false);
+  const getUsers = async () => {
+    const response = await fetch("/api/getUsers", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const data = await response.json();
+    console.log("Data", data);
+    setUsers(data);
+  };
+
+  useEffect(() => {
+    getUsers();
+  }, []);
+
+  useEffect(() => {
+    console.log("Users", users);
+    if (address) {
+      const user = findAddress(address as string);
+      console.log("User", user);
+      //Check if user is there first
+      if (user) {
+        console.log(user.valid);
+        if (user.valid === true) {
+          setIsUserValid(true);
+        } else {
+          setIsUserValid(false);
+        }
+      }
+    }
+  }, [users]);
+
+  useEffect(() => {
+    console.log("Is User Valid", isUserValid);
+  }, [isUserValid]);
+
+  const findAddress = (address: string) => {
+    const user = users.find(
+      (user) => user.address.toLowerCase() === address.toLowerCase()
+    );
+    return user;
+  };
+
   //Dealing with the responses
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if(message.trim() === "exit()"){
-
-
+    if (message.trim() === "exit()") {
     }
+
+
 
     if (!message.trim()) {
       console.error("Message is empty. Please enter a message.");
+      return;
+    }
+
+    if(isUserValid === false){
+      window.alert("You are not a valid user, please donate to become a valid user")
       return;
     }
 
@@ -86,17 +140,17 @@ export default function Chatbox({showChat, setShowChat}: ChatMessageProps) {
 
   return (
     <div className="fixed z-20  h-full bottom-0 bg-black/50 top-0 left-0 right-0 flex flex-col items-center justify-center py-[1rem] ">
-           <div className="flex flex-row gap-[10px]">
-              <div 
-              onClick={() => setShowChat(false)}
-              className="banner-tag cursor-pointer text-[12px] sm:text-[14px] !w-[150px]">
-              CLOSE TERMINAL
-              </div>
-            </div>
+      <div className="flex flex-row gap-[10px]">
+        <div
+          onClick={() => setShowChat(false)}
+          className="banner-tag cursor-pointer text-[12px] sm:text-[14px] !w-[150px]"
+        >
+          CLOSE TERMINAL
+        </div>
+      </div>
 
-      <div className="container-box h-[400px] overflow-scroll relative border-dashed w-[400px]">
-        
-        <form
+      <div className="container-box h-[400px] overflow-scroll relative border-dashed w-[400px] formbox">
+      <form
           onSubmit={handleSubmit}
           className="flex h-full relative  flex-col gap-[2px] text-[14px]"
         >
@@ -106,7 +160,8 @@ export default function Chatbox({showChat, setShowChat}: ChatMessageProps) {
                 <div className="user-message-content">
                   {/* <div className="user-message-text"> $wave ~ {response.question}</div> */}
                   <div className="user-message-text text-[12px]">
-                    {`particle~${response.question}`}</div>
+                    {`particle~${response.question}`}
+                  </div>
                 </div>
               </div>
 
@@ -130,9 +185,8 @@ export default function Chatbox({showChat, setShowChat}: ChatMessageProps) {
               placeholder="type your message here travler"
               className="w-full text-[10px] outline-none bg-transparent "
             />
-           
           </div>
-           {/* <button
+          {/* <button
               type="submit"
               className="fixed submitBtn  text-white p-[1rem] rounded-md"
             >

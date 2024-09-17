@@ -152,3 +152,8 @@ cursor: pointer !important;
   background: auto !important; 
   cursor: pointer !important;
 }
+
+
+.formbox{
+  scrollbar-width: none;  /* Firefox */
+}

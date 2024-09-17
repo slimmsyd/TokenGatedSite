@@ -178,7 +178,6 @@ const getUsers = async () => {
 
 
   const data = await response.json();
-  console.log("Data", data)
   setUsers(data);
 }
 
@@ -188,7 +187,6 @@ useEffect(() => {
 }, []);
 
 useEffect(() => {
-  console.log("Users", users)
 }, [users])
 
   const isAddressInUsers = (address: string) => {

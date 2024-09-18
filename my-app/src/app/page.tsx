@@ -248,13 +248,21 @@ useEffect(() => {
         "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmSiQQaUMLdEzFpLUjBVa5ck8CwXsQMXKSW6EKKGyqVaNJ/blackweb.mp4",
     },
     "NO.4": {
+      title: "TERRAPIN CRYPTO SOLUTIONS | CRYPTO AGENCY(In Progress)",
+      description:
+        "A decentralized application for crypto enthusiasts in the Web3 space, featuring Web3 dApp capabilities allowing users to get paid in crypto. Includes CMS Admin features for clients to easily update content.",
+      link: "https://terra-pin-crypto.vercel.app/",
+      video:
+        "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmRRZbQVL2nJHhLVfJ5UXwEFFuCB42EKRc1SdDBjVXLpa9",
+    },
+    "NO.5": {
       title: "CREATED 2 GROW | AGENCY WEBSITE",
       description: "A professional website for a digital growth agency.",
       video:
         "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmSiQQaUMLdEzFpLUjBVa5ck8CwXsQMXKSW6EKKGyqVaNJ/created2grow.mp4",
       link: "https://www.created2grow.com/",
     },
-    "NO.5": {
+    "NO.6": {
       title: "OLD PORTFOLIO | REACT APP",
       description:
         "Old portoflio website, of rememberance of old times and ideas",

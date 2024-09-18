@@ -38,25 +38,25 @@ export default function Popup({
               <span>{value.title} </span>
             </div>
 
-            <div className="flex flex-row gap-[20px] ">
+            <div className="flex flex-row gap-[0px] md:gap-[20px] ">
               <span className="w-[400px] border-dashed ">
                 <Video
                   src={value.video ?? ""}
                   type={value.video ? "video/mp4" : "video/mov"}
                   width="100%"
-                  height="auto"
+                  height="100%"
                   controls={true}
                   autoPlay={true}
                   loop={true}
                   muted={false}
-                  className="pointerEventsYes"
+                  className="pointerEventsYes h-[100%]"
                 />
               </span>
 
               <div className="flex flex-col w-[50%] gap-[10px] p-3 text-center md:text-left md:items-start items-center">
                 <h1 className="text-[18px] ">sass project</h1>
 
-                <p className="text-[14px] w-[80%]">{value.description}</p>
+                <p className="text-[14px] text-left md:text-left w-[80%]">{value.description}</p>
 
                 <Link
                   href={value.link}

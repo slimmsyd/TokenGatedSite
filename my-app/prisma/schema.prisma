@@ -28,3 +28,4 @@ model Image {
   updatedAt DateTime @updatedAt
   link      String?
 }
+

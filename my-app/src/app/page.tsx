@@ -283,9 +283,9 @@ useEffect(() => {
   };
   const changeLog = {
     "NO.1":
-      "Add Database to store wallets that donated 90 cents in SOl || ETH || BTC",
+      "Add Contact Form To Website",
     "NO.2":
-      "ADD Sub Social Community for users to share posts | Sign To The Blockhain | SOL",
+      "Add Admin CMS to update content",
     "NO.3": "ADD COMMUNITY FORUM FOR USERS TO DISCUSS IDEAS",
   };
 

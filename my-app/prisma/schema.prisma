@@ -11,21 +11,20 @@ datasource db {
 
 model CryptoAddress {
   id                Int       @id @default(autoincrement())
-  address           String?    @unique
+  address           String?   @unique
   type              String?
   valid             Boolean?  @default(false)
   donationTimestamp DateTime?
   donationAmount    Float?
-  transactionHash  String?   // <-- Add this field
+  transactionHash   String?
   questionsAsked    Int?      @default(0)
 }
 
 model Image {
   id        Int      @id @default(autoincrement())
   url       String
-  link      String?
   alt       String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  link      String?
 }
-

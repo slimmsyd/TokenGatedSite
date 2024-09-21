@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Video from "../components/Video";
 import { useAccount } from "wagmi";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 interface Module {
   id: number;
@@ -216,6 +217,7 @@ export default function CourseContainer() {
 
   return (
     <div className="main-container min-h-screen w-full flex flex-col items-start justify-start">
+   
       <div className="videoContainer h-[500px] w-full">
         <Video
           src="https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmaLGSyy1Q8hiiQh6hfBkUxLTQGsxoY18Ua3r2XsvAETWY"
@@ -253,6 +255,15 @@ export default function CourseContainer() {
         {showAddCourse && (
           <div className="mt-8 w-full">
             <h2 className="text-2xl font-semibold mb-4">Create New Course</h2>
+            <input
+              type="text"
+              value={newCourse.videoURL}
+              onChange={(e) =>
+                setNewCourse({ ...newCourse, videoURL: e.target.value })
+              }
+              placeholder="Video URL"
+              className="w-full p-2 mb-4 border rounded"
+            />
             <input
               type="text"
               value={newCourse.title}

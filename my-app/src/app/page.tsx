@@ -20,7 +20,7 @@ import { parseUnits } from "viem";
 import { db } from "./lib/db";
 import dynamic from "next/dynamic";
 import Chatbox from "./components/chatbox";
-import Web3 from "web3";``
+import Web3 from "web3";
 
 // Dynamically import p5 with ssr option set to false
 const p5 = dynamic(
@@ -32,9 +32,11 @@ const p5 = dynamic(
 );
 
 export default function Home() {
-
-  const web3 = new Web3(`https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`);
+  const web3 = new Web3(
+    `https://eth-mainnet.g.alchemy.com/v2/${process.env.NEXT_PUBLIC_ALCHEMY_API_KEY}`
+  );
   const { isConnected, address } = useAccount();
+  const ADMINADDRESS = "0xDcFD8d5BD36667D16aDDD211C59BCdE1A9c4e23B";
   const [connectedAddress, setConnectedAddress] = useState<string | undefined>(
     undefined
   );
@@ -100,102 +102,90 @@ export default function Home() {
 
   const handleDonation = async () => {
     try {
-
       const provider = new ethers.BrowserProvider(window.ethereum);
-    
+
       // Request account access if needed
       await provider.send("eth_requestAccounts", []);
-      
+
       // Get the signer
       const signer = await provider.getSigner();
-  
+
       const tx = {
         to: DONATION_ADDRESS,
-        value: parseEther(DONATION_AMOUNT)
+        value: parseEther(DONATION_AMOUNT),
       };
-  
+
       // Send the transaction
       const transaction = await signer.sendTransaction(tx);
-      
 
       const receipt = await transaction.wait();
 
-
       // console.log("Transaction successful with hash:", receipt)
-      setDonationHash(receipt?.blockHash || "")
-      if(receipt?.blockHash !== null || receipt?.blockHash !== undefined || receipt?.blockHash !== ""){
+      setDonationHash(receipt?.blockHash || "");
+      if (
+        receipt?.blockHash !== null ||
+        receipt?.blockHash !== undefined ||
+        receipt?.blockHash !== ""
+      ) {
+        setDonationStatus(true);
+        console.log("Donation status", donationStatus);
+      }
+    } catch (error) {
+      console.log("Error donating", error);
+    }
+  };
+  //Add the user to the databse
 
-        setDonationStatus(true)
-        console.log("Donation status", donationStatus)
+  async function addUserToDatabase(address: string, donationHash: string) {
+    try {
+      const response = await fetch("/api/addUser", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ address, transactionHash: donationHash }),
+      });
 
-    } 
-  }catch(error){
-    console.log("Error donating", error)
+      console.log("Response", response);
+    } catch (error) {
+      console.error("Error adding user:", error);
+    }
   }
 
-}
-//Add the user to the databse 
+  useEffect(() => {
+    console.log("Donation status", donationStatus);
+    if (donationStatus) {
+      console.log("Donation status in if", donationStatus);
+      addUserToDatabase(address as string, donationHash || "");
+    }
+  }, [donationStatus]);
 
- async function addUserToDatabase(address: string, donationHash: string){
-  try{
-    const response = await fetch('/api/addUser', {
-      method: 'POST',
+  const [users, setUsers] = useState<any[]>([]);
+  const getUsers = async () => {
+    const response = await fetch("/api/getUsers", {
+      method: "GET",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify({ address, transactionHash: donationHash }),
-    })
+    });
 
-    console.log("Response", response)
-  }catch(error){
-    console.error('Error adding user:', error);
-  }
-}
+    const data = await response.json();
+    setUsers(data);
+  };
 
+  useEffect(() => {
+    getUsers();
+  }, []);
 
-
-
-
-useEffect(() => {
-
-  console.log("Donation status", donationStatus)
-  if(donationStatus){
-    console.log("Donation status in if", donationStatus)
-    addUserToDatabase(address as string, donationHash || "")
-  }
-
-}, [donationStatus])
-
-
-const [users, setUsers] = useState<any[]>([]);
-const getUsers = async () => {
-  const response = await fetch('/api/getUsers', {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-
-
-  const data = await response.json();
-  setUsers(data);
-}
-
-useEffect(() => {
-  getUsers();
-
-}, []);
-
-useEffect(() => {
-}, [users])
+  useEffect(() => {}, [users]);
 
   const isAddressInUsers = (address: string) => {
-
-
-    if(address === null || address === undefined || address === ""){  
-      return false
-    }else{
-      return users.some(user => user.address.toLowerCase() === address.toLowerCase());
+    if (address === null || address === undefined || address === "") {
+      return false;
+    } else {
+      return users.some(
+        (user) => user.address.toLowerCase() === address.toLowerCase()
+      );
     }
   };
 
@@ -205,7 +195,6 @@ useEffect(() => {
       console.log(`Address ${address} exists in users: ${addressExists}`);
     }
   }, [address, users]);
-
 
   //Obect containg personal informaiton
   const personalInfo = {
@@ -278,14 +267,13 @@ useEffect(() => {
     NEWSLETTER: "2 MONTHS",
   };
   const articles = {
-    "NO.1": "BENAVOLENT AI",
-    "NO.2": "LANGUAGE AS A PREDICTOR OF REALTIIY",
+    "NO.1": { title: "Check out Courses", link: "/courses" },
+    "NO.2": { title: "BENAVOLENT AI", link: "/" },
+    "NO.3": { title: "LANGUAGE AS A PREDICTOR OF REALTIIY", link: "/" },
   };
   const changeLog = {
-    "NO.1":
-      "Add Contact Form To Website",
-    "NO.2":
-      "Add Admin CMS to update content",
+    "NO.1": "Add Contact Form To Website",
+    "NO.2": "Add Admin CMS to update content",
     "NO.3": "ADD COMMUNITY FORUM FOR USERS TO DISCUSS IDEAS",
   };
 
@@ -421,7 +409,55 @@ useEffect(() => {
     return () => clearTimeout(timeout);
   }, [text, isDeleting, wordIndex]);
 
-  const [showChat, setShowChat] = useState<boolean>(false);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState("");
+  const [showChat, setShowChat] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState("");
+
+  const submitContact = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+
+    try {
+      const response = await fetch(
+        "https://hook.us1.make.com/7b13vf6hmrm2ee356vuohofxi11sk496",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ firstName, lastName, email, phoneNumber, message }),
+        }
+      );
+
+      // let responseData;
+      // const contentType = response.headers.get("content-type");
+      // if (contentType && contentType.includes("application/json")) {
+      //   responseData = await response.json();
+      // } else {
+      //   responseData = await response.text();
+      // }
+  
+      // console.log("Logging the webhook response:", responseData);
+  
+      if (response.ok) {
+        // Clear form fields after successful submission
+        setFirstName("");
+        setLastName("");
+        setEmail("");
+        setMessage("");
+        setPhoneNumber("");
+        alert("Message sent successfully!");
+      } else {
+        alert("Failed to send message. Please try again.", );
+      }
+    } catch (error) {
+      console.error("Error submitting contact:", error);
+      alert("An error occurred. Please try again later.");
+    }
+  };
 
   return (
     <div className="main-container  h-[100vh] text-[28px] w-full flex flex-center items-start justify-start">
@@ -637,14 +673,15 @@ useEffect(() => {
 
             <div className="flex flex-row gap-[10px]">
               <div className="container-box  overflow-hidden scrollbar-hide relative flex flex-col items-start justify-start p-4 w-full">
-                {isAddressInUsers(address as string) ? (
-                 null
-                ) :  <div className="overlay absolute w-full h-full bg-black/50  flex items-center justify-center mb-4">
-                <button
-                onClick={handleDonation}
-                className="mb-10 z-10 text-[18px] relative cursor-pointer"
-              >{`[ donate to view ]`}</button>
-            </div>}
+                {isAddressInUsers(address as string) ||
+                address === ADMINADDRESS ? null : (
+                  <div className="overlay absolute w-full h-full bg-black/50  flex items-center justify-center mb-4">
+                    <button
+                      onClick={handleDonation}
+                      className="mb-10 z-10 text-[18px] relative cursor-pointer"
+                    >{`[ donate to view ]`}</button>
+                  </div>
+                )}
                 <div className="flex flex-col gap-[5px]  text-[12px] sm:text-[14px]  w-full ">
                   {Object.entries(articles).map(([key, value], index) => {
                     const lastIndex = index === entries.length - 1;
@@ -654,7 +691,9 @@ useEffect(() => {
                         className={`pl-[5px] flex flex-row gap-[10px] btn-hover
     }`}
                       >
-                        {key} | {value}
+                        <Link href={value.link}>
+                          {key} | {value.title}
+                        </Link>
                       </div>
                     );
                   })}
@@ -715,6 +754,73 @@ useEffect(() => {
                       </div>
                     );
                   })}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="outer-box pt-[2rem] ">
+            <div className="flex flex-row gap-[10px]">
+              <div className="banner-tag  text-[12px] sm:text-[14px] !w-[150px]">
+                CONTACT ME
+              </div>
+
+              <p className=" text-[12px] sm:text-[14px]">
+                *to those looking for a cracked enigneer*
+              </p>
+            </div>
+
+            <div className="flex flex-row gap-[10px]">
+              <div className="container-box flex flex-col items-start justify-start p-4 w-full">
+                <div className="flex flex-col gap-[5px]  text-[12px] sm:text-[14px] w-full ">
+                  <form
+                    className="flex flex-col gap-[5px]"
+                    onSubmit={submitContact}
+                  >
+                    <input
+                      className="contact-input"
+                      type="text"
+                      placeholder="first name"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      required
+                    />
+                    <input
+                      className="contact-input"
+                      type="text"
+                      placeholder="last name"
+                      value={lastName}
+                      onChange={(e) => setLastName(e.target.value)}
+                      required
+                    />
+                    <input
+                      className="contact-input"
+                      type="email"
+                      placeholder="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                    <input
+                      className="contact-input"
+                      type="tel"
+                      placeholder="phone number"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value)}
+                      
+                    />
+                    <textarea
+                      className="contact-input max-h-[300px] min-h-[100px] resize-none"
+                      placeholder="message"
+                      rows={4}
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      required
+                    />
+                    <button className="contact-button" type="submit">
+                      submit
+                    </button>
+                  </form>
                 </div>
               </div>
             </div>

@@ -217,7 +217,11 @@ export default function CourseContainer() {
 
   return (
     <div className="main-container min-h-screen w-full flex flex-col items-start justify-start">
-   
+      <div className="flex flex-row px-[10px] items-center justify-center gap-[10px] mb-[10px]">
+      <Link href="/"> {`[home]`}</Link>
+        <Link href="/courses"> {`[courses]`}</Link>
+      </div>
+
       <div className="videoContainer h-[500px] w-full">
         <Video
           src="https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmaLGSyy1Q8hiiQh6hfBkUxLTQGsxoY18Ua3r2XsvAETWY"

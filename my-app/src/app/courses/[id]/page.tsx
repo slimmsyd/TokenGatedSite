@@ -55,7 +55,18 @@ export default function CoursePage() {
   }, [isAdminMode]);
 
   if (!course) {
-    return <div>Loading...</div>;
+
+    return(
+      <div className = "min-h-screen w-full flex flex-col items-center justify-center">
+        <h1 className="text-3xl">
+          Loading
+          <span className="animate-typing">...</span>
+        </h1>
+      </div>
+    )
+
+
+
   }
 
   // ... existing useEffect for fetching course ...
@@ -106,9 +117,9 @@ export default function CoursePage() {
 
   return (
     <div className="main-container min-h-screen w-full flex flex-col items-start justify-start">
-      <div className="flex flex-row items-center justify-center gap-[10px] mb-[10px]">
+      <div className="flex flex-row px-[10px] items-center justify-center gap-[10px] mb-[10px]">
         <Link href="/"> {`[home]`}</Link>
-        <Link href="/"> {`[course]`}</Link>
+        <Link href="/courses"> {`[courses]`}</Link>
       </div>
       <div className="videoContainer h-[500px] w-full">
         <Video

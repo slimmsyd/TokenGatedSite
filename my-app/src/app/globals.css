@@ -116,6 +116,13 @@ button:hover,
   border: 0.5px dashed rgba(64, 224, 125, 0.75);
 }
 
+.contact-input{
+  border: 0.5px dashed rgba(64, 224, 125, 0.75);
+  background: transparent;
+  color: rgba(64, 224, 125, 0.75);
+  padding:5px;
+}
+
 #defaultCanvas1{
   display: none;
 }
@@ -156,4 +163,20 @@ cursor: pointer !important;
 
 .formbox{
   scrollbar-width: none;  /* Firefox */
+}
+
+
+@keyframes typing {
+  0% { width: 0; }
+  33% { width: 1ch; }
+  66% { width: 2ch; }
+  100% { width: 3ch; }
+}
+
+.animate-typing {
+  overflow: hidden;
+  display: inline-block;
+  vertical-align: bottom;
+  animation: typing 1.5s steps(3) infinite;
+  white-space: nowrap;
 }

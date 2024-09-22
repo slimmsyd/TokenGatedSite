@@ -34,21 +34,22 @@ model Course {
   title     String
   author    String
   date      DateTime
-  modules   Module[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  modules   Module[]
 }
+
 model Module {
   id         Int      @id @default(autoincrement())
   title      String
-  videoURL   String
-  course     Course   @relation(fields: [courseId], references: [id])
   courseId   Int
   concepts   String[]
   objectives String[]
   activities String[]
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+  videoURL   String
+  course     Course   @relation(fields: [courseId], references: [id])
 
   @@index([courseId])
 }

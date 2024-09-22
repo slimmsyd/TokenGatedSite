@@ -295,6 +295,7 @@ export default function Home() {
   const addUser = async (userData: any) => {
     try {
       const response = await fetch("/api/addUser", {
+
         method: "POST",
         headers: {
           "Content-Type": "application/json",

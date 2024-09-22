@@ -237,7 +237,7 @@ export default function Home() {
         "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmSiQQaUMLdEzFpLUjBVa5ck8CwXsQMXKSW6EKKGyqVaNJ/blackweb.mp4",
     },
     "NO.4": {
-      title: "TERRAPIN CRYPTO SOLUTIONS | CRYPTO AGENCY(In Progress)",
+      title: "TERRAPIN CRYPTO SOLUTIONS | CRYPTO CONSULTING",
       description:
         "A decentralized application for crypto enthusiasts in the Web3 space, featuring Web3 dApp capabilities allowing users to get paid in crypto. Includes CMS Admin features for clients to easily update content.",
       link: "https://terra-pin-crypto.vercel.app/",

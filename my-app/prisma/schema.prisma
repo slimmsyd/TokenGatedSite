@@ -32,7 +32,6 @@ model Image {
 model Course {
   id        Int      @id @default(autoincrement())
   title     String
-  
   author    String
   date      DateTime
   createdAt DateTime @default(now())

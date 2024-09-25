@@ -63,6 +63,11 @@ export default function Home() {
     address,
   });
 
+
+  const scrollToSection = (sectionId: string) => {
+    document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth" });
+  };
+
   // This useEffect will trigger when the balanceData changes
   const [currentBal, setCurrentBal] = useState<string>("");
   useEffect(() => {
@@ -229,6 +234,13 @@ export default function Home() {
         "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmaLGSyy1Q8hiiQh6hfBkUxLTQGsxoY18Ua3r2XsvAETWY",
     },
     "NO.3": {
+      title: "OnCode | Software Development Agency",
+      description:
+        "A software development agency that provides custom software solutions to businesses.",
+      link: "https://www.0ncode.com/",
+      video:"/",
+    },
+    "NO.4": {
       title: "BLACK WEB 3 | CRYPTO dAPP",
       description:
         "A decentralized application for crypto enthusiasts in the Web3 space.",
@@ -236,7 +248,7 @@ export default function Home() {
       video:
         "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmSiQQaUMLdEzFpLUjBVa5ck8CwXsQMXKSW6EKKGyqVaNJ/blackweb.mp4",
     },
-    "NO.4": {
+    "NO.5": {
       title: "TERRAPIN CRYPTO SOLUTIONS | CRYPTO CONSULTING",
       description:
         "A decentralized application for crypto enthusiasts in the Web3 space, featuring Web3 dApp capabilities allowing users to get paid in crypto. Includes CMS Admin features for clients to easily update content.",
@@ -244,14 +256,14 @@ export default function Home() {
       video:
         "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmRRZbQVL2nJHhLVfJ5UXwEFFuCB42EKRc1SdDBjVXLpa9",
     },
-    "NO.5": {
+    "NO.6": {
       title: "CREATED 2 GROW | AGENCY WEBSITE",
       description: "A professional website for a digital growth agency.",
       video:
         "https://teal-artistic-bonobo-612.mypinata.cloud/ipfs/QmSiQQaUMLdEzFpLUjBVa5ck8CwXsQMXKSW6EKKGyqVaNJ/created2grow.mp4",
       link: "https://www.created2grow.com/",
     },
-    "NO.6": {
+    "NO.7": {
       title: "OLD PORTFOLIO | REACT APP",
       description:
         "Old portoflio website, of rememberance of old times and ideas",
